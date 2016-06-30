@@ -1182,22 +1182,25 @@ imidiately closed.
 
 =head2 new
 
-This method creates YAHC object and accompanying storage object:
+This method creates a YAHC object and an accompanying storage object:
 
     my ($yahc, $yahc_storage) = YAHC->new();
 
-This is a radical way of solving all possible memleak because of cyclic
-references in callbacks. Since all references of callbacks are kept in
-$yahc_storage object it's fine to use YAHC object inside request callback:
+This is a radical way of avoiding the memory leaks (cyclic references) 
+that are usually associated with the use of callbacks. Since all the 
+relevant references are kept in the $yahc_storage object, it is fine to 
+use a YAHC object inside a request callback without needing to be 
+concerned about a memory leak.
 
-    my $yahc->request({
+    $yahc->request({
         callback => sub {
             $yahc->stop; # this is fine!!!
         },
     });
 
-However, user has to guarantee that both $yahc and $yahc_storage objects are
-kept in the same namespace. So, they will be destroyed at the same time.
+However, the user has to guarantee that both $yahc and $yahc_storage 
+objects are kept within the same scope so that they will be destroyed 
+at the same time.
 
 C<new> can be passed with all parameters supported by C<request>. They
 will be inherited by all requests.
